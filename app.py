@@ -81,15 +81,26 @@ if __name__ == "__main__":
     # Create PDF version of the report
     # HTML(string=html_out).write_pdf(target=time.strftime("%b-%d-%y") + "_batch.html", stylesheets=[CSS('bootstrap.css')])
 
-    print(os.path.join(os.pardir, time.strftime("%b-%d-%y %I:%M%p") + "_batch.html"))
-
-    batch_dir = os.pardir + "/Batches"
+    """
+    Create Batches Directory
+    """
+    batch_dir = os.path.join(os.pardir,"Batches")
 
     if not os.path.exists(batch_dir):
         os.makedirs(batch_dir)
 
+    os.chdir(batch_dir)
+
+    """
+    Create filename with time stamp
+    """
+    t = time.localtime()
+    timestamp = time.strftime('%b-%d-%Y_%H.%M', t)
+    BATCH_NAME = ("batch-" + timestamp + ".html")
+    print(BATCH_NAME)
+
     # Create HTML version of the report
-    with open(os.path.join(batch_dir, time.strftime("%b-%d-%y %I:%M%p") + "_batch.html"), 'w') as f:
+    with open(BATCH_NAME, 'w') as f:
         f.write(html_out)
         f.close()
         pass
