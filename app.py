@@ -6,6 +6,7 @@ from Utils import beans_to_roast, beans_remove_inventory
 from PivotUtils import create_lb_pivot, create_gm_pivot, create_batch_df, create_green_inventory, create_green_pivot
 import argparse
 import time
+import os
 
 
 if __name__ == "__main__":
@@ -80,8 +81,15 @@ if __name__ == "__main__":
     # Create PDF version of the report
     # HTML(string=html_out).write_pdf(target=time.strftime("%b-%d-%y") + "_batch.html", stylesheets=[CSS('bootstrap.css')])
 
+    print(os.path.join(os.pardir, time.strftime("%b-%d-%y %I:%M%p") + "_batch.html"))
+
+    batch_dir = os.pardir + "/Batches"
+
+    if not os.path.exists(batch_dir):
+        os.makedirs(batch_dir)
+
     # Create HTML version of the report
-    with open(time.strftime("%b-%d-%y %I:%M%p") + "_batch.html", 'w') as f:
+    with open(os.path.join(batch_dir, time.strftime("%b-%d-%y %I:%M%p") + "_batch.html"), 'w') as f:
         f.write(html_out)
         f.close()
         pass
