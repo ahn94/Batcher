@@ -34,6 +34,16 @@ def create_green_pivot(df):
         fill_value='-'
     )
 
+def create_bag_pivot(df):
+    return pd.pivot_table(
+        df,
+        index='Coffee Type',
+        columns='Bag Size (oz)',
+        values='Qty',
+        aggfunc=np.sum,
+        fill_value='-'
+    )
+
 
 def create_green_inventory(dfBeans, dfBeanTypeInfo):
     columns = ['Coffee Type', 'lb']

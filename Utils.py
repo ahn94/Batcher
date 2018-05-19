@@ -10,6 +10,12 @@ def beans_to_roast(df):
     df = round_bean_nearest_gram(df)
     return df
 
+def df_labels(df):
+    df = remove_empty_beans(df)
+    df = remove_instock_beans(df)
+    df = remove_green_beans(df)
+    return df
+
 
 def beans_remove_inventory(df):
     df = remove_empty_beans(df)

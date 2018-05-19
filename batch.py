@@ -2,15 +2,15 @@
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
-from Utils import beans_to_roast, beans_remove_inventory
-from PivotUtils import create_lb_pivot, create_gm_pivot, create_batch_df, create_green_inventory, create_green_pivot
+from Utils import beans_to_roast, beans_remove_inventory, df_labels
+from PivotUtils import create_lb_pivot, create_gm_pivot, create_batch_df, create_green_inventory, create_green_pivot, create_bag_pivot
 import argparse
 import time
 import os
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generate PDF report')
+    parser = argparse.ArgumentParser(description='Generate file in Coffee Batches folder for (batch #)')
     parser.add_argument('batch', type=int, help='batch #')
     args = parser.parse_args()
 
@@ -18,8 +18,11 @@ if __name__ == "__main__":
     env = Environment(loader=FileSystemLoader('./templates'))
     template = env.get_template('report.html')
 
+    t = time.localtime()
+    timestamp = time.strftime('%b-%d-%Y', t)
+
     # Read in the excel file
-    xls = pd.ExcelFile('PandasTestFileV2.xlsx')
+    xls = pd.ExcelFile('../BatchSpreadsheet.xlsx')
     dfBeans = pd.read_excel(xls, sheet_name="Beans", converters={'IS': str, 'Batch#': int})
     dfBeanTypeInfo = pd.read_excel(xls, sheet_name="BeanTypeInfo")
 
@@ -27,6 +30,8 @@ if __name__ == "__main__":
     Batch
     """
     dfBeans = dfBeans[dfBeans['Batch#'] == args.batch]
+    dfLabels = df_labels(dfBeans)
+
 
     """
     Inventory
@@ -49,6 +54,8 @@ if __name__ == "__main__":
     gm_pivot = create_gm_pivot(dfBatch)
     lb_pivot = create_lb_pivot(dfBatch)
     green_pivot = create_green_pivot(dfGreenBatch)
+    bag_pivot = create_bag_pivot(dfLabels)
+
 
     """
     Styling
@@ -56,6 +63,7 @@ if __name__ == "__main__":
     # Add bootstrap style to tables
     html_lb_pivot = lb_pivot.style.set_table_attributes('class="table table-striped table-bordered"').render()
     html_gm_pivot = gm_pivot.style.set_table_attributes('class="table table-striped table-bordered"').render()
+    html_bag_pivot = bag_pivot.style.set_table_attributes('class="table table-striped table-bordered"').render()
 
     html_green_pivot = "<h3>No Inventory used</h3>"
     if len(green_pivot) > 0:
@@ -66,9 +74,10 @@ if __name__ == "__main__":
     """
     # Template variables
     template_vars = {
-        "title": "Batch Report - " + time.strftime("%b-%d-%y"),
+        "title": "Batch "+ str(args.batch) +" - " + timestamp,
         "batch_pivot_lb": html_lb_pivot,
         "batch_pivot_gm": html_gm_pivot,
+        "bag_pivot": html_bag_pivot,
         "green_pivot": html_green_pivot
     }
 
@@ -94,13 +103,14 @@ if __name__ == "__main__":
     """
     Create filename with time stamp
     """
-    t = time.localtime()
-    timestamp = time.strftime('%b-%d-%Y_%H.%M', t)
-    BATCH_NAME = ("batch-" + timestamp + ".html")
-    print(BATCH_NAME)
+    BATCH_NAME = (str(args.batch) + "-batch_" + timestamp + ".html")
+
 
     # Create HTML version of the report
     with open(BATCH_NAME, 'w') as f:
         f.write(html_out)
         f.close()
+        print('\n------------------ Batch Creator ------------------')
+        print("Batch "+ str(args.batch) +" saved as: " + BATCH_NAME)
+        print('----------------------------------------------------')
         pass
