@@ -4,14 +4,13 @@ from PivotUtils import create_green_inventory, create_green_pivot
 from tabulate import tabulate
 
 # Read in the excel file
-xls = pd.ExcelFile('../BatchSpreadsheet.xlsx')
+xls = pd.ExcelFile('../Example.xlsx')
 dfBeans = pd.read_excel(xls, sheet_name="Beans", converters={'IS': str, 'Batch#': int})
 dfBeanTypeInfo = pd.read_excel(xls, sheet_name="BeanTypeInfo", index_col=0)
 
 """
 Inventory
 """
-
 dfGreen = beans_remove_inventory(dfBeans)
 dfGreenBatch = create_green_inventory(dfGreen, dfBeanTypeInfo)
 green_pivot = create_green_pivot(dfGreenBatch)

@@ -107,7 +107,7 @@ if __name__ == "__main__":
     """
     Create filename with time stamp
     """
-    BATCH_NAME = (str(args.batch) + "-batch_" + timestamp + ".html")
+    BATCH_NAME = (str(args.batch) + "-batch" + ".html")
 
     # Create HTML version of the report
     with open(BATCH_NAME, 'w') as f:
@@ -115,9 +115,7 @@ if __name__ == "__main__":
         f.close()
         print('\n------------------ Batch Creator ----------')
         print("Batch "+ str(args.batch) +" saved as: " + BATCH_NAME)
-        print('\n\n---------- Batch(lb) ----------')
-        headers = ['Green Bean', 'lb']
-        print(lb_pivot)
-        # lb_pivot = lb_pivot.sort_values(by=['Roast'], ascending=False)
-        print(tabulate(lb_pivot, headers='keys', tablefmt='fancy_grid'))
+        print('---------- Batch(gm) ----------')
+        headers = ['Green Bean', 'gram']
+        print(tabulate(gm_pivot, headers='keys', tablefmt='fancy_grid', floatfmt='.0f'))
         pass
