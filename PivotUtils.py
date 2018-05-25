@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from pandas import Series
 
 
 # Create lb pivot table
@@ -34,6 +35,7 @@ def create_green_pivot(df):
         fill_value='-'
     )
 
+
 def create_bag_pivot(df):
     return pd.pivot_table(
         df,
@@ -62,10 +64,11 @@ def create_green_inventory(dfBeans, dfBeanTypeInfo):
     return dfBatch
 
 
-def create_batch_df(dfBeans, dfBeanTypeInfo):
+def create_batch_df(dfBeans, dfBeanTypeInfo, dfGreen):
     # Create new data frame for batches
     columns = ['Coffee Type', 'Roast', 'lb', 'gm']
-    dfBatch = pd.DataFrame(columns=columns)
+    df_batch = pd.DataFrame(columns=columns)
+    greens = Series(dfGreen['Default Roast'].values, index=dfGreen['Green Bean'])
 
     # loop through bean table and create batch data frame
     for bi, beanrow in dfBeans.iterrows():
@@ -73,10 +76,20 @@ def create_batch_df(dfBeans, dfBeanTypeInfo):
             # Gets info for blends and singles from beantypeinfo
             if beanrow['Coffee Type'] == greenrow['Coffee Type']:
                 # add to batch data frame
-                dfBatch.loc[len(dfBatch)] = [
+                df_batch.loc[len(df_batch)] = [
                     greenrow['Green Bean'],
-                    beanrow['Roast'],
+                    get_roast(beanrow['Roast'], greens, greenrow['Green Bean']),
                     greenrow['Ratio'] * beanrow['lb'],
                     greenrow['Ratio'] * beanrow['gm']
                 ]
-    return dfBatch
+    return df_batch
+
+
+def get_roast(roast, default, green_bean):
+    if not pd.isnull(roast):
+        return roast
+
+    if green_bean in default:
+        return default[green_bean]
+
+    return "Roast: NA"

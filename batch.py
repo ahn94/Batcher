@@ -7,6 +7,7 @@ from PivotUtils import create_lb_pivot, create_gm_pivot, create_batch_df, create
 import argparse
 import time
 import os
+from tabulate import tabulate
 
 
 if __name__ == "__main__":
@@ -23,8 +24,9 @@ if __name__ == "__main__":
 
     # Read in the excel file
     xls = pd.ExcelFile('../BatchSpreadsheet.xlsx')
-    dfBeans = pd.read_excel(xls, sheet_name="Beans", converters={'IS': str, 'Batch#': int})
+    dfBeans = pd.read_excel(xls, sheet_name="Beans", converters={'IS': str, 'Batch#': int, 'Roast': str})
     dfBeanTypeInfo = pd.read_excel(xls, sheet_name="BeanTypeInfo")
+    dfGreenBeans = pd.read_excel(xls, sheet_name="GreenBeans")
 
     """
     Batch
@@ -45,7 +47,7 @@ if __name__ == "__main__":
     # Clean up Beans table and add column for green weight(lb & oz)
     dfBeans = beans_to_roast(dfBeans)
     # creates data for pivot tables
-    dfBatch = create_batch_df(dfBeans, dfBeanTypeInfo)
+    dfBatch = create_batch_df(dfBeans, dfBeanTypeInfo, dfGreenBeans)
 
     """
     Pivots
@@ -56,14 +58,16 @@ if __name__ == "__main__":
     green_pivot = create_green_pivot(dfGreenBatch)
     bag_pivot = create_bag_pivot(dfLabels)
 
-
     """
     Styling
     """
     # Add bootstrap style to tables
     html_lb_pivot = lb_pivot.style.set_table_attributes('class="table table-striped table-bordered"').render()
     html_gm_pivot = gm_pivot.style.set_table_attributes('class="table table-striped table-bordered"').render()
-    html_bag_pivot = bag_pivot.style.set_table_attributes('class="table table-striped table-bordered"').render()
+
+    html_bag_pivot = "<h3>No beans to bag. No beans in batch or all of them are marked as in stock.</h3>"
+    if len(bag_pivot):
+        html_bag_pivot = bag_pivot.style.set_table_attributes('class="table table-striped table-bordered"').render()
 
     html_green_pivot = "<h3>No Inventory used</h3>"
     if len(green_pivot) > 0:
@@ -74,7 +78,7 @@ if __name__ == "__main__":
     """
     # Template variables
     template_vars = {
-        "title": "Batch "+ str(args.batch) +" - " + timestamp,
+        "title": "Batch " + str(args.batch) + " - " + timestamp,
         "batch_pivot_lb": html_lb_pivot,
         "batch_pivot_gm": html_gm_pivot,
         "bag_pivot": html_bag_pivot,
@@ -105,12 +109,15 @@ if __name__ == "__main__":
     """
     BATCH_NAME = (str(args.batch) + "-batch_" + timestamp + ".html")
 
-
     # Create HTML version of the report
     with open(BATCH_NAME, 'w') as f:
         f.write(html_out)
         f.close()
-        print('\n------------------ Batch Creator ------------------')
+        print('\n------------------ Batch Creator ----------')
         print("Batch "+ str(args.batch) +" saved as: " + BATCH_NAME)
-        print('----------------------------------------------------')
+        print('\n\n---------- Batch(lb) ----------')
+        headers = ['Green Bean', 'lb']
+        print(lb_pivot)
+        # lb_pivot = lb_pivot.sort_values(by=['Roast'], ascending=False)
+        print(tabulate(lb_pivot, headers='keys', tablefmt='fancy_grid'))
         pass
