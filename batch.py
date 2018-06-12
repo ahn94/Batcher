@@ -2,7 +2,7 @@
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
-from Utils import beans_to_roast, beans_remove_inventory, df_labels
+from Utils import beans_to_roast, beans_remove_inventory, df_labels, rename_labels
 from PivotUtils import create_lb_pivot, create_gm_pivot, create_batch_df, create_green_inventory, create_green_pivot, create_bag_pivot
 import argparse
 import time
@@ -58,6 +58,8 @@ if __name__ == "__main__":
     green_pivot = create_green_pivot(dfGreenBatch)
     bag_pivot = create_bag_pivot(dfLabels)
 
+    bag_pivot = rename_labels(bag_pivot)
+
     """
     Styling
     """
@@ -87,12 +89,6 @@ if __name__ == "__main__":
 
     # Render template
     html_out = template.render(template_vars)
-
-    """
-    Reports
-    """
-    # Create PDF version of the report
-    # HTML(string=html_out).write_pdf(target=time.strftime("%b-%d-%y") + "_batch.html", stylesheets=[CSS('bootstrap.css')])
 
     """
     Create Batches Directory

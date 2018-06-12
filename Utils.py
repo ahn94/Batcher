@@ -52,3 +52,5 @@ def round_bean_nearest_gram(df):
     return df
 
 
+def rename_labels(df):
+    return df.rename({12: '12oz', 16: '1lb', 32: '2lb', 80: '5lb'}, axis='columns')
