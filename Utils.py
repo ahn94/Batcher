@@ -25,10 +25,12 @@ def beans_remove_inventory(df):
     return df
 
 
+# removes empty bean row
+# removes rows with empty order id
 def remove_empty_beans(df):
     return df[df['Order ID'].notnull()]
 
-
+# removes instock beans
 def remove_instock_beans(df):
     return df[df.IS != 'x']
 
@@ -36,7 +38,7 @@ def remove_instock_beans(df):
 def remove_green_beans(df):
     return df[df.Roast != 'Green']
 
-
+# calculates green weight for each bean row.
 def add_green_lb_column(df, shrink_rate):
     df['lb'] = (df['Bag Size (oz)'] / 16) * df['Qty'] * np.where(df.Roast == 'Green', 1, shrink_rate)
     return df
