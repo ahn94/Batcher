@@ -3,6 +3,10 @@ from Utils import beans_remove_inventory
 from PivotUtils import create_green_inventory, create_green_pivot
 from tabulate import tabulate
 import numpy as np
+from jinja2 import Environment, FileSystemLoader
+import os
+
+
 
 # Read in the excel file
 xls = pd.ExcelFile('../BatchSpreadsheet.xlsx')
@@ -10,6 +14,11 @@ dfBeans = pd.read_excel(xls, sheet_name="Beans", converters={'IS': str, 'Batch#'
 dfBeanTypeInfo = pd.read_excel(xls, sheet_name="BeanTypeInfo")
 dfInventory = pd.read_excel(xls, sheet_name="Inventory", converters={'Green Bean': str, 'lb': float})
 dfInventory = dfInventory[['Green Bean', 'lb']]
+
+
+# Prepares jinga2 templates
+env = Environment(loader=FileSystemLoader('./templates'))
+template = env.get_template('inv-report.html')
 
 """
 Inventory
@@ -44,3 +53,32 @@ Format Output
 """
 headers = ['Green Bean', 'lb']
 print(tabulate(dfTotals, headers, tablefmt='fancy_grid'))
+
+html_inventory = dfTotals.style.set_table_attributes('class="table table-striped table-bordered"').render()
+
+
+template_vars = {
+    "inventory_table": html_inventory
+}
+
+html_out = template.render(template_vars)
+
+
+"""
+Create Batches Directory
+"""
+batch_dir = os.path.join(os.pardir,"Batches")
+
+if not os.path.exists(batch_dir):
+    os.makedirs(batch_dir)
+
+os.chdir(batch_dir)
+
+"""
+Create filename with time stamp
+"""
+# Create HTML version of the report
+with open("inventory.html", 'w') as f:
+    f.write(html_out)
+    f.close()
+    pass

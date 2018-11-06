@@ -70,6 +70,7 @@ def create_batch_df(dfBeans, dfBeanTypeInfo, dfGreen):
     df_batch = pd.DataFrame(columns=columns)
     greens = Series(dfGreen['Default Roast'].values, index=dfGreen['Green Bean'])
 
+
     # loop through bean table and create batch data frame
     for bi, beanrow in dfBeans.iterrows():
         for gi, greenrow in dfBeanTypeInfo.iterrows():
@@ -93,3 +94,22 @@ def get_roast(roast, default, green_bean):
         return default[green_bean]
 
     return "Roast: NA"
+
+
+def create_blend_df(dfBeans, dfBeanTypeInfo):
+    # Create new data frame for batches
+    columns = ['Coffee Type', 'Green Bean', 'gm']
+    df_batch = pd.DataFrame(columns=columns)
+
+    # loop through bean table and create batch data frame
+    for bi, beanrow in dfBeans.iterrows():
+        for gi, greenrow in dfBeanTypeInfo.iterrows():
+            # Gets info for blends and singles from beantypeinfo
+            if beanrow['Coffee Type'] == greenrow['Coffee Type']:
+                # add to batch data frame
+                df_batch.loc[len(df_batch)] = [
+                    beanrow['Coffee Type'],
+                    greenrow['Green Bean'],
+                    greenrow['Ratio'] * beanrow['gm']
+                ]
+    return df_batch

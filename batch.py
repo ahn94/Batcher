@@ -2,8 +2,8 @@
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
-from Utils import beans_to_roast, beans_remove_inventory, df_labels, rename_labels
-from PivotUtils import create_lb_pivot, create_gm_pivot, create_batch_df, create_green_inventory, create_green_pivot, create_bag_pivot
+from Utils import beans_to_roast, beans_remove_inventory, df_labels, rename_labels, get_final_blend_grams
+from PivotUtils import create_lb_pivot, create_gm_pivot, create_batch_df, create_green_inventory, create_green_pivot, create_bag_pivot, create_blend_df
 import argparse
 import time
 import os
@@ -38,8 +38,17 @@ if __name__ == "__main__":
     """
     Inventory
     """
+    # removes empty beans, removes instock beans, adds green lb column
     dfGreen = beans_remove_inventory(dfBeans)
     dfGreenBatch = create_green_inventory(dfGreen, dfBeanTypeInfo)
+
+    # get blends only, without the 1.16 shrinkage
+    dfBlends = beans_remove_inventory(dfBeans, shrinkage=1)
+    dfBlends = get_final_blend_grams(dfBlends, dfBeanTypeInfo)
+    dfBlendBatch = create_blend_df(dfBlends, dfBeanTypeInfo)
+
+    dfBlendInfo = dfBlendBatch.groupby(['Coffee Type', 'Green Bean']).sum()
+    dfBlendTotal = dfBlendBatch.groupby(['Coffee Type']).sum()
 
     """
     Roast
@@ -75,16 +84,21 @@ if __name__ == "__main__":
     if len(green_pivot) > 0:
         html_green_pivot = green_pivot.style.set_table_attributes('class="table table-striped table-bordered"').render()
 
+    html_blend_info = dfBlendInfo.style.set_table_attributes('class="table table-striped table-bordered"').render()
+    html_blend_total = dfBlendTotal.style.set_table_attributes('class="table table-striped table-bordered"').render()
+
     """
     Template
     """
     # Template variables
     template_vars = {
-        "title": "Batch " + str(args.batch) + " - " + timestamp,
-        "batch_pivot_lb": html_lb_pivot,
+        # "title": "Batch " + str(args.batch) + " - " + timestamp,
+        # "batch_pivot_lb": html_lb_pivot,
         "batch_pivot_gm": html_gm_pivot,
         "bag_pivot": html_bag_pivot,
-        "green_pivot": html_green_pivot
+        # "green_pivot": html_green_pivot,
+        "blend_total": html_blend_total,
+        "blend_info": html_blend_info
     }
 
     # Render template
