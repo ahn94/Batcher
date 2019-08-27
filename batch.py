@@ -54,14 +54,19 @@ if __name__ == "__main__":
     Roast
     """
     # Clean up Beans table and add column for green weight(lb & oz)
+
     dfBeans = beans_to_roast(dfBeans)
     # creates data for pivot tables
+
+
     dfBatch = create_batch_df(dfBeans, dfBeanTypeInfo, dfGreenBeans)
 
     """
     Pivots
     """
     # Create pivots
+    # print(tabulate(dfBatch, floatfmt='.2f'))
+    # print(dfBatch)
     gm_pivot = create_gm_pivot(dfBatch)
     lb_pivot = create_lb_pivot(dfBatch)
     green_pivot = create_green_pivot(dfGreenBatch)

@@ -69,31 +69,31 @@ headers = ['Green Bean', 'lb', 'value']
 # print(tabulate(dfTotals, headers, tablefmt='fancy_grid', floatfmt='.2f'))
 print(tabulate(dfPivot, headers, tablefmt='fancy_grid', floatfmt='.2f'))
 
-# html_inventory = dfTotals.style.set_table_attributes('class="table table-striped table-bordered"').render()
+html_inventory = dfTotals.style.set_table_attributes('class="table table-striped table-bordered"').render()
 
 
-# template_vars = {
-#     "inventory_table": html_inventory
-# }
+template_vars = {
+    "inventory_table": html_inventory
+}
 
-# html_out = template.render(template_vars)
+html_out = template.render(template_vars)
 
 
-# """
-# Create Batches Directory
-# """
-# batch_dir = os.path.join(os.pardir,"Batches")
+"""
+Create Batches Directory
+"""
+batch_dir = os.path.join(os.pardir,"Batches")
 
-# if not os.path.exists(batch_dir):
-#     os.makedirs(batch_dir)
+if not os.path.exists(batch_dir):
+    os.makedirs(batch_dir)
 
-# os.chdir(batch_dir)
+os.chdir(batch_dir)
 
-# """
-# Create filename with time stamp
-# """
-# # Create HTML version of the report
-# with open("inventory.html", 'w') as f:
-#     f.write(html_out)
-#     f.close()
-#     pass
+"""
+Create filename with time stamp
+"""
+# Create HTML version of the report
+with open("inventory.html", 'w') as f:
+    f.write(html_out)
+    f.close()
+    pass

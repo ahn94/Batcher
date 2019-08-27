@@ -5,8 +5,8 @@ def beans_to_roast(df):
     df = remove_empty_beans(df)
     df = remove_instock_beans(df)
     df = remove_green_beans(df)
-    df = add_green_lb_column(df, 1.16)
-    df = add_green_gm_column(df, 1.16)
+    df = add_green_lb_column(df, 1.17)
+    df = add_green_gm_column(df, 1.17)
     df = round_bean_nearest_gram(df)
     return df
 
@@ -18,7 +18,7 @@ def df_labels(df):
     return df
 
 
-def beans_remove_inventory(df, shrinkage=1.16):
+def beans_remove_inventory(df, shrinkage=1.17):
     df = remove_empty_beans(df)
     df = remove_instock_beans(df)
     df = add_green_lb_column(df, shrinkage)
@@ -73,6 +73,7 @@ def add_green_gm_column(df, shrink_rate):
 
 
 def round_bean_nearest_gram(df):
+    df.gm = df.gm.astype(float)
     df.gm = df.gm.round()
     return df
 
