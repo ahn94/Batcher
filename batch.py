@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # creates data for pivot tables
 
 
-    dfBatch = create_batch_df(dfBeans, dfBeanTypeInfo, dfGreenBeans)
+    dfBatch = create_batch_df(dfBeans, dfBeanTypeInfo)
 
     """
     Pivots

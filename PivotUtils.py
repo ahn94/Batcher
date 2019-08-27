@@ -64,12 +64,10 @@ def create_green_inventory(dfBeans, dfBeanTypeInfo):
     return dfBatch
 
 
-def create_batch_df(dfBeans, dfBeanTypeInfo, dfGreen):
+def create_batch_df(dfBeans, dfBeanTypeInfo):
     # Create new data frame for batches
     columns = ['Coffee Type', 'Roast', 'lb', 'gm']
     df_batch = pd.DataFrame(columns=columns)
-    greens = Series(dfGreen['Default Roast'].values, index=dfGreen['Green Bean'])
-
 
     # loop through bean table and create batch data frame
     for bi, beanrow in dfBeans.iterrows():
@@ -79,21 +77,17 @@ def create_batch_df(dfBeans, dfBeanTypeInfo, dfGreen):
                 # add to batch data frame
                 df_batch.loc[len(df_batch)] = [
                     greenrow['Green Bean'],
-                    get_roast(beanrow['Roast'], greens, greenrow['Green Bean']),
+                    get_roast(beanrow['Roast'], greenrow['Roast']),
                     greenrow['Ratio'] * beanrow['lb'],
                     greenrow['Ratio'] * beanrow['gm']
                 ]
     return df_batch
 
 
-def get_roast(roast, default, green_bean):
+def get_roast(roast, default):
     if not pd.isnull(roast):
-        return roast
-
-    if green_bean in default:
-        return default[green_bean]
-
-    return "Roast: NA"
+        return roast  
+    return default
 
 
 def create_blend_df(dfBeans, dfBeanTypeInfo):
