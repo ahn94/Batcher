@@ -42,9 +42,10 @@ dfTotals = pd.concat([dfGreenBatch, dfInventory])
 dfTotals['lb'] = pd.to_numeric(dfTotals['lb'])
 
 # create value column on dfTotals
-dfGreenBeans.pop('Default Roast')
 dfGreenBeans.set_index('Green Bean', inplace=True)
 prices = dfGreenBeans.to_dict()
+# remove nan rows
+dfTotals = dfTotals[dfTotals['lb'].notnull()]
 dfTotals['value'] = dfTotals.apply(lambda row: row['lb'] * prices['value'].get(row['Green Bean']), axis=1)
 
 
